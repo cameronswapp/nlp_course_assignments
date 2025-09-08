@@ -9,7 +9,7 @@ Please edit this document directly (as a markdown file) and push to GitHub. Answ
 
 ### Basic Intro
 
-Name: 
+Name: Cameron Swapp
 
 Undergraduate Degree (completed or working towards): Data Science
 
