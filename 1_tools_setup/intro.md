@@ -24,7 +24,7 @@ What do you like to do for fun?: I love playing basketball and other sports as w
 ### Knowledge Check
 
 1. On a scale of 1-10 how much experience do you have coding in Python, 1 being no experience, 10 being world-class expert?
-If you've coded in Python before what type of projects/work have you done? **6, I have built neural networks and finetuned
+If you've coded in Python before what type of projects/work have you done? **7, I have built neural networks and finetuned
 vision transformers in Python.**
 
 2. Have you ever built an ML model before? If so, what type(s) of model(s)? **Yes, I have built Random Forests, Feedforward
