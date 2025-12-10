@@ -7,14 +7,15 @@ from sentence_transformers import util
 from sentence_transformers.cross_encoder import CrossEncoder
 from google import genai
 import numpy as np
+from exa_py import Exa
 
 load_dotenv()
 
-def generateQuery(ctx: RunContext[str], user_request: str) -> str:
+def databaseQuery(ctx: RunContext[str], query: str) -> list[dict]:
     """
-    Use this function to generate a read-only SQL query based on the user's request.
-
-    The only tables you can use are: students, grades, sports, and student_sports.
+    Use this function to execute a read-only SQL query against the Aggies database.
+    You should use this function any time a user asks for information about the Aggies sports players or their grades.
+    Generate the appropriate SQL query to get the information requested by the user.
 
     Here is the schema of the Aggies database:
     students table:
@@ -46,41 +47,25 @@ def generateQuery(ctx: RunContext[str], user_request: str) -> str:
     The student_sports table contains information about which students play which sports, their jersey numbers, positions, championships won, and years played.
     The grades table contains information about student grades in various subjects.
 
-    Do not generate a query that doesn't work with the schema provided.
-    """
-    llm = genai.Client()
-    prompt = f"You are an expert SQL generator. The user asked for the information contained here: {user_request}. Based on the database schema provided, generate a read-only SQL query to retrieve the requested information. Do not generate a query that does not work with the schema provided. Only provide the SQL query without any additional text."
-    response = llm.models.generate_content(
-        model="gemini-2.5-flash",
-        config=genai.types.GenerateContentConfig(
-            system_instruction="The SQL query you generate must be read-only and work with the Aggies database schema provided."
-        ),
-        contents=prompt
-    )
-    return response.text
-
-def databaseQuery(ctx: RunContext[str], query: str) -> str:
-    """
-    Use this function to execute a read-only SQL query against the Aggies database.
-    You should use this function any time a user asks for information about the Aggies sports players or their grades.
-    Use generateQuery to create the appropriate SQL query to get the information requested by the user.
+    Do not generate a query that does not adhere to the above schema.
 
     Use the result of the database query to answer the user's question.
 
-    param query: A read-only SQL query string.
+    param query: A question about Aggie sports players or their grades.
     """
     uri = "file:aggies.db?mode=ro"
     db_conn = sqlite3.connect(uri, uri=True)
+    db_conn.row_factory = sqlite3.Row
     cursor = db_conn.cursor()
 
     cursor.execute(query)
     rows = cursor.fetchall()
     db_conn.close()
 
-    # Convert sqlite Row objects → JSON-serializable dicts
-    return rows
+    # Convert sqlite3.Row objects to plain dicts
+    return [dict(row) for row in rows]
 
-def ragTool(query):
+def ragTool(ctx: RunContext[str], query: str) -> dict:
     """
     Use this tool to answer questions about Aggie sports and gameday procedures via Retrieval Augmented Generation.
     This will be helpful when the user asks questions that are not related to specific players or their grades.
@@ -117,17 +102,39 @@ def ragTool(query):
     top2_idx = np.argsort(scores)[::-1][:2]
 
     top_2_chunks = [candidate_chunks[i] for i in top2_idx]
-    
-    context1, context2 = top_2_chunks
-    prompt = f"The user asked the following question: {query}\n\nHere are two relevant paragraphs to help give you context:\n{context1}\n{context2}"
 
-    llm = genai.Client()
-    response = llm.models.generate_content(
-        model="gemini-2.5-flash",
-        config=genai.types.GenerateContentConfig(
-            system_instruction="You are an Aggie assistant that helps retrieve information from Aggie sports documents"
-        ),
-        contents=prompt
+    return {
+        "query": query,
+        "retrieved_chunks": top_2_chunks,
+    }
+
+exa = Exa(api_key=os.getenv("EXA_API_KEY"))
+
+def websearch(ctx: RunContext[str], query: str) -> dict:
+    """
+    Search the web using Exa.ai.
+    Use this tool when the user asks questions that require up-to-date information about Aggie sports, such as recent game results, player news, or upcoming events.
+    If the user asks about the 'Aggies', make sure to search for the Utah State Aggies, as there are multiple schools whose nickname is the Aggies.
+
+    param query: A user question that may require web search to answer.
+
+    return: A dictionary containing the search results with titles, URLs, and snippets.
+
+    Use the information from these results to answer the user's question.
+    """
+    results = exa.search_and_contents(
+        query=query,
+        type="auto",
+        num_results=5,
     )
-    # 5. Return result of LLM
-    return response.text
+
+    # Convert Exa response into something the model can reason over
+    items = []
+    for r in results.results:
+        items.append({
+            "title": r.title,
+            "url": r.url,
+            "snippet": r.text or "",
+        })
+
+    return {"results": items}

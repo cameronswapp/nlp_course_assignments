@@ -12,9 +12,39 @@ load_dotenv()
 agent = Agent(
     model='google-gla:gemini-2.5-flash-lite',
     deps_type = str,
-    system_prompt=("""You are AggieAI, an AI assistant to help Utah State fans with information about Aggie sports players."""
+    max_result_retries=3,
+    system_prompt=("""You are AggieAI, an AI assistant to help Utah State fans with information about Aggie sports players.
+                   If the user asks a question that is related to players, grades, classes, or sports, you must use the generateQuery and databaseQuery tools to get the information from the database.
+                   Only generate SQL queries that are read-only and work with the provided database schema.
+                   Here is the schema of the Aggies database:
+                    students table:
+                        - student_id (INTEGER, PRIMARY KEY)
+                        - name (TEXT)
+                        - grad_year (INTEGER)
+
+                    grades table:
+                        - grade_id (INTEGER, PRIMARY KEY)
+                        - student_id (INTEGER, FOREIGN KEY to students.student_id)
+                        - subject (TEXT)
+                        - grade (TEXT)
+
+                    sports table:
+                        - sport_id (INTEGER, PRIMARY KEY)
+                        - sport_name (TEXT)
+                    
+                    student_sports table:
+                        - student_id (INTEGER, FOREIGN KEY to students.student_id)
+                        - sport_id (INTEGER, FOREIGN KEY to sports.sport_id)
+                        - jersey_number (INTEGER)
+                        - championships_won (INTEGER)
+                        - position (TEXT)
+                        - years_played (INTEGER)
+                   
+                   If the user asks questions about other topics, first use the ragTool to get relevant information from the provided documents, then use that information to answer the user's question.
+                   If the user asks questions that are very recent or about current events, use the websearch tool to get the latest information from the web to answer the user's question.
+                   """
     ),
-    tools = [tools.generateQuery, tools.databaseQuery, tools.ragTool],
+    tools = [tools.databaseQuery, tools.ragTool, tools.websearch],
     instrument = True
 )
 
