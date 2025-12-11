@@ -12,7 +12,6 @@ load_dotenv()
 agent = Agent(
     model='google-gla:gemini-2.5-flash-lite',
     deps_type = str,
-    max_result_retries=3,
     system_prompt=("""You are AggieAI, an AI assistant to help Utah State fans with information about Aggie sports players.
                    If the user asks a question that is related to players, grades, classes, or sports, you must use the generateQuery and databaseQuery tools to get the information from the database.
                    Only generate SQL queries that are read-only and work with the provided database schema.
