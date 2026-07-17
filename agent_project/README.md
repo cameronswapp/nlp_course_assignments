@@ -4,7 +4,7 @@ Welcome to AggieAI, your AI assistant for all things Utah State Aggies! This hel
 
 Additionally, AggieAI is well versed on gameday procedures, school traditions, and guidelines and other info on major events in Aggie athletics. You can also request updates on the latest scores and standings, and AggieAI will be happy to help out!
 
-To run AggieAI, enter the agent_project directory in your terminal and run chainlit run app.py
+To run AggieAI, enter the agent_project directory in your terminal and run `chainlit run app.py`
 
 ## Starter Examples
 
