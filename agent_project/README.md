@@ -4,6 +4,8 @@ Welcome to AggieAI, your AI assistant for all things Utah State Aggies! This hel
 
 Additionally, AggieAI is well versed on gameday procedures, school traditions, and guidelines and other info on major events in Aggie athletics. You can also request updates on the latest scores and standings, and AggieAI will be happy to help out!
 
+To run AggieAI, enter the agent_project directory in your terminal and run chainlit run app.py
+
 ## Starter Examples
 
 Below are examples of how to request the different information that AggieAI has access to. Feel free to copy and paste these prompts into the chatbot to get started!
@@ -34,7 +36,7 @@ _What was the score of the last Utah State football game?_
 
 
 
-## Test Cases (for Matt)
+## Test Cases
 
 #### Test 1
 
@@ -62,6 +64,6 @@ _What was the score of the last Utah State football game?_
 
 #### Test 5
 
-**Question:** What bowl game is Utah State playing in this year?
+**Question:** What was the result of Utah State's most recent bowl game?
 
-**Answer:** This will call the websearch tool. Utah State is playing in the Famous Idaho Potato bowl against Washington State.
+**Answer:** This will call the websearch tool. Utah State lost to Washington State in the Famous Idaho Potato bowl.
