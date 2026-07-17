@@ -4,7 +4,11 @@ Welcome to AggieAI, your AI assistant for all things Utah State Aggies! This hel
 
 Additionally, AggieAI is well versed on gameday procedures, school traditions, and guidelines and other info on major events in Aggie athletics. You can also request updates on the latest scores and standings, and AggieAI will be happy to help out!
 
-To run AggieAI, enter the agent_project directory in your terminal and run `chainlit run app.py`
+To run AggieAI, enter the agent_project directory in your terminal and run `chainlit run app.py`. You will also need a Google API key stored in a .env file. This .env file should be in the parent directory of agent_project. One line of .env should look like this:
+
+```GOOGLE_API_KEY = "key_goes_here"```
+
+**Note:** The data in the database and in the documents that the agent has access to are almost entirely fabricated as this agent is for demonstration purposes only. Some player names and jersey numbers are correct, but most players are not real people and all grades are completely made up.
 
 ## Starter Examples
 
